@@ -1,3 +1,5 @@
+from main.py import whatColor, board 
+
 #Pieces moveset
 #TO DO: Pawn, King, Queen, Rook, Bishop, Knight
 
@@ -15,28 +17,28 @@
 
 #Pawn Moves
 #to be checked, not done yet
-def pawnMoveset(position, color, board, firstMove):
+def pawnMoveset(row, col, color, board, firstMove):
     moves = []
     #Determines moving direction
     direction = 1 if color == 'white' else -1
-    startRow = position[0]
-    column = position[1]
+    startRow = row
+    column = col
 
     #Move forward one square
-    if board[startRow + direction][column] == '--':  #empty square is represented as '--'
+    if board[startRow + direction][column] == 0:  #empty square is represented as 0
         moves.append((startRow + direction, column))
         #Move forward two squares from the starting position
-        if firstMove and board[startRow + 2 * direction][column] == '--':
+        if firstMove and board[startRow + 2 * direction][column] == 0:
             moves.append((startRow + 2 * direction, column))
 
     #Captures to the left
     if column > 0:  #Ensure within the board limits
-        if board[startRow + direction][column - 1] != '--' and board[startRow + direction][column - 1][0] != color[0]:
+        if board[startRow + direction][column - 1] != 0 and whatColor(board[startRow + direction][column - 1]) != color:
             moves.append((startRow + direction, column - 1))
 
     #Captures to the right
     if column < 7:  #Ensure within the board limits
-        if board[startRow + direction][column + 1] != '--' and board[startRow + direction][column + 1][0] != color[0]:
+        if board[startRow + direction][column + 1] != 0 and whatColor(board[startRow + direction][column + 1][0]) != color:
             moves.append((startRow + direction, column + 1))
 
     return moves
@@ -45,7 +47,8 @@ def pawnMoveset(position, color, board, firstMove):
 
 # #King Moves
 # #Code here 
-# def kingMoveset(position, color, board, firstMove)
+#def kingMoveset(position, color, board, firstMove):
+    
 
 
 
@@ -99,3 +102,10 @@ def pawnMoveset(position, color, board, firstMove):
 # #
 
 ##########################################################################################################################################
+
+## Check for valid moves:
+
+def isValidMove(currRow, currCol, row, column, piece):
+    moves = []
+    if abs(piece) == 1:
+        moves = pawnMoveset(currRow, currCol, board, firstMove)
