@@ -83,12 +83,85 @@ def draw_chessboard(canvas, board):
             if symbol:  
                 canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white' if color == 'black' else 'black')
 
+# def on_canvas_click(event):
+#     global isPieceChosen, RowChosen, colChosen, pieceChosen 
+#     col = (event.x - board_start_x) // square_size
+#     row = (event.y - board_start_y) // square_size
+#     if 0 <= col < 8 and 0 <= row < 8:  # Ensure the click is within the bounds of the chessboard
+#         if isPieceChosen == False:
+#             print(f"Clicked on row {row}, column {col}")
+#             pieceChosen = board[row][col]
+#             if pieceChosen is None:
+#                 return
+#             else:
+#                 isPieceChosen = True
+#                 RowChosen = row
+#                 colChosen = col
+#                 x1 = col * square_size + board_start_x
+#                 y1 = row * square_size + board_start_y
+#                 x2 = x1 + square_size
+#                 y2 = y1 + square_size
+#                 canvas.create_rectangle(x1, y1, x2, y2, fill='pink')
+#                 symbol = get_piece_symbol(pieceChosen)
+#                 if symbol:  
+#                     canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
+#                     return 
+
+#         if isPieceChosen == True:
+#                 if(row == RowChosen & col == colChosen):
+#                     isPieceChosen = False
+#                     x1 = col * square_size + board_start_x
+#                     y1 = row * square_size + board_start_y
+#                     x2 = x1 + square_size
+#                     y2 = y1 + square_size
+#                     color = 'white' if (row + col) % 2 == 0 else 'black'
+#                     canvas.create_rectangle(x1, y1, x2, y2, fill=color)
+#                     symbol = get_piece_symbol(pieceChosen)
+#                     if symbol:  
+#                         canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
+#                     return 
+#                 # Moving the peice or checking if the piece is valid or not 
+#                 else:
+#                     isPieceChosen == False
+#                     color = board[RowChosen][colChosen].color
+#                     isFirst = board[RowChosen][colChosen].firstMove #Checking if its the piece's first move or not
+#                     moves = pawnMoveset(row, col, color, board, isFirst)
+#                     size = moves.len()
+#                     for i in range(size):
+#                         if((row, col) == moves(i)):
+#                             piece = board[row][col]
+#                             piece.move(row, col)
+#                             board[row][col] = piece
+#                             board[RowChosen][colChosen] = None
+#                             draw_chessboard(canvas, board)
+#                             return 
+
+       
+
+# def choose_move(event):
+#     isPieceChosen = False
+#     col = (event.x - board_start_x) // square_size
+#     row = (event.y - board_start_y) // square_size
+#     if 0 <= col < 8 and 0 <= row < 8:  # Ensure the click is within the bounds of the chessboard
+#         if(row == RowChosen & col == colChosen):
+#             isPieceChosen = False
+#             x1 = col * square_size + board_start_x
+#             y1 = row * square_size + board_start_y
+#             x2 = x1 + square_size
+#             y2 = y1 + square_size
+#             color = 'white' if (row + col) % 2 == 0 else 'black'
+#             canvas.create_rectangle(x1, y1, x2, y2, fill=color)
+#             symbol = get_piece_symbol(pieceChosen)
+#             if symbol:  
+#                 canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
+#             return 
+        
 def on_canvas_click(event):
-    global isPieceChosen, RowChosen, colChosen, pieceChosen 
+    global isPieceChosen, RowChosen, colChosen, pieceChosen
     col = (event.x - board_start_x) // square_size
     row = (event.y - board_start_y) // square_size
     if 0 <= col < 8 and 0 <= row < 8:  # Ensure the click is within the bounds of the chessboard
-        if isPieceChosen == False:
+        if not isPieceChosen:
             print(f"Clicked on row {row}, column {col}")
             pieceChosen = board[row][col]
             if pieceChosen is None:
@@ -103,60 +176,32 @@ def on_canvas_click(event):
                 y2 = y1 + square_size
                 canvas.create_rectangle(x1, y1, x2, y2, fill='pink')
                 symbol = get_piece_symbol(pieceChosen)
-                if symbol:  
+                if symbol:
                     canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
-                    return 
-
-        if isPieceChosen == True:
-                if(row == RowChosen & col == colChosen):
-                    isPieceChosen = False
-                    x1 = col * square_size + board_start_x
-                    y1 = row * square_size + board_start_y
-                    x2 = x1 + square_size
-                    y2 = y1 + square_size
-                    color = 'white' if (row + col) % 2 == 0 else 'black'
-                    canvas.create_rectangle(x1, y1, x2, y2, fill=color)
-                    symbol = get_piece_symbol(pieceChosen)
-                    if symbol:  
-                        canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
-                    return 
-                # Moving the peice or checking if the piece is valid or not 
-                else:
-                    isPieceChosen == False
-                    color = board[RowChosen][colChosen].color
-                    isFirst = board[RowChosen][colChosen].firstMove #Checking if its the piece's first move or not
-                    moves = pawnMoveset(row, col, color, board, isFirst)
-                    size = moves.len()
-                    for i in range(size):
-                        if((row, col) == moves(i)):
-                            piece = board[row][col]
-                            piece.move(row, col)
-                            board[row][col] = piece
-                            board[RowChosen][colChosen] = None
-                            draw_chessboard(canvas, board)
-                            return 
-
-       
-
-def choose_move(event):
-    isPieceChosen = False
-    col = (event.x - board_start_x) // square_size
-    row = (event.y - board_start_y) // square_size
-    if 0 <= col < 8 and 0 <= row < 8:  # Ensure the click is within the bounds of the chessboard
-        if(row == RowChosen & col == colChosen):
-            isPieceChosen = False
-            x1 = col * square_size + board_start_x
-            y1 = row * square_size + board_start_y
-            x2 = x1 + square_size
-            y2 = y1 + square_size
-            color = 'white' if (row + col) % 2 == 0 else 'black'
-            canvas.create_rectangle(x1, y1, x2, y2, fill=color)
-            symbol = get_piece_symbol(pieceChosen)
-            if symbol:  
-                canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24), fill='white')
-            return 
-        
-
+                return
+        else:
+            if row == RowChosen and col == colChosen:
+                isPieceChosen = False
+                # Redraw the original square color
+                x1 = colChosen * square_size + board_start_x
+                y1 = RowChosen * square_size + board_start_y
+                x2 = x1 + square_size
+                y2 = y1 + square_size
+                original_color = 'white' if (RowChosen + colChosen) % 2 == 0 else 'black'
+                canvas.create_rectangle(x1, y1, x2, y2, fill=original_color)
+                symbol = get_piece_symbol(board[RowChosen][colChosen])
+                if symbol:
+                    canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text=symbol, font=('Arial', 24),
+                                       fill='white')
+                return
+            else:
+                # Move the piece
+                pieceChosen.move(row, col)
+                board[row][col] = pieceChosen
+                board[RowChosen][colChosen] = None
+                isPieceChosen = False
+                draw_chessboard(canvas, board)
+                return
 
 def whatColor(row, column):
     piece = board[row][column]
