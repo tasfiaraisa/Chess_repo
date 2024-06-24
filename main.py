@@ -260,6 +260,41 @@ def knightMoveset(row, col, color, board):
 ##########################################################################################################################
 ##########################################################################################################################
 
+def find_king_position(board, color):
+    for row in range(8):
+        for col in range(8):
+            piece = board[row][col]
+            if piece is not None and piece.name == 'King' and piece.color == color:
+                return (row, col)
+
+def generate_all_possible_moves(board, color):
+    moves = []
+    for row in range(8):
+        for col in range(8):
+            piece = board[row][col]
+            if piece is not None and piece.color == color:
+                if piece is not None and piece.color == color:
+                    if piece.name == 'Pawn':
+                        moves.extend(kingMoveset(row, col, piece.color, board, piece.firstMove))
+                    elif piece.name == 'Bishop':
+                        moves.extend(bishopMoveset(row, col, piece.color, board))
+                    elif piece.name == 'Rook':
+                        moves.extend(rookMoveset(row, col, piece.color, board, piece.firstMove))
+                    elif piece.name == 'Queen':
+                        moves.extend(queenMoveset(row, col, piece.color, board))
+                    elif piece.name == 'Knight':
+                        moves.extend(knightMoveset(row, col, piece.color, board))
+                    elif piece.name == 'King':
+                        moves.extend(kingMoveset(row, col, piece.color, board, piece.firstMove))
+    return moves
+
+def is_king_under_threat(board, color):
+    king_position = find_king_position(board, color)
+    opponent_color = 'white' if color == 'black' else 'black'
+    moves = generate_all_possible_moves(board, opponent_color)
+
+    if king_position in moves:
+        return True
 
 def on_canvas_click(event):
     global isPieceChosen, RowChosen, colChosen, pieceChosen
