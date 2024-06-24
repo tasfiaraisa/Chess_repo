@@ -1,4 +1,4 @@
-from main.py import whatColor, board 
+from main import *
 
 #Pieces moveset
 #TO DO: Pawn, King, Queen, Rook, Bishop, Knight
@@ -25,20 +25,20 @@ def pawnMoveset(row, col, color, board, firstMove):
     column = col
 
     #Move forward one square
-    if board[startRow + direction][column] == 0:  #empty square is represented as 0
+    if board[startRow + direction][column] is None:  #empty square is represented as 0
         moves.append((startRow + direction, column))
         #Move forward two squares from the starting position
-        if firstMove and board[startRow + 2 * direction][column] == 0:
+        if firstMove and board[startRow + 2 * direction][column] == None:
             moves.append((startRow + 2 * direction, column))
 
     #Captures to the left
     if column > 0:  #Ensure within the board limits
-        if board[startRow + direction][column - 1] != 0 and whatColor(board[startRow + direction][column - 1]) != color:
+        if board[startRow + direction][column - 1] is not None and whatColor(board[startRow + direction][column - 1]) != color:
             moves.append((startRow + direction, column - 1))
 
     #Captures to the right
     if column < 7:  #Ensure within the board limits
-        if board[startRow + direction][column + 1] != 0 and whatColor(board[startRow + direction][column + 1][0]) != color:
+        if board[startRow + direction][column + 1] is not None and whatColor(board[startRow + direction][column + 1]) != color:
             moves.append((startRow + direction, column + 1))
 
     return moves
@@ -47,9 +47,22 @@ def pawnMoveset(row, col, color, board, firstMove):
 
 # #King Moves
 # #Code here 
-#def kingMoveset(position, color, board, firstMove):
+def kingMoveset(row, col, color, board, firstMove):
+    moves = []
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, 1), (1, 0), (0, -1), (-1, 0)]  
+    #Check each of the possible directions
+    for d in directions:
+            newRow, newCol = row + d[0], col + d[1]
+            if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
+                if board[newRow][newCol] is None:  #The square is empty
+                    moves.append((newRow, newCol))
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
+                    moves.append((newRow, newCol))
+                    break  #Stop extending in this direction after a capture
+                else:
+                    break  #Stop if there is a piece of the same color
     
-
+    return moves
 
 
 # #
@@ -90,9 +103,9 @@ def bishopMoveset(row, col, color, board):
         for i in range(1, 8):  #bishop can move up to 7 squares in each direction
             newRow, newCol = row + d[0] * i, col + d[1] * i
             if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
-                if board[newRow][newCol] == 0:  #The square is empty
+                if board[newRow][newCol] is None:  #The square is empty
                     moves.append((newRow, newCol))
-                elif whatColor(board[newRow][newCol]) != color:  #The square contains an enemy piece
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
                     moves.append((newRow, newCol))
                     break  #Stop extending in this direction after a capture
                 else:
@@ -101,8 +114,6 @@ def bishopMoveset(row, col, color, board):
                 break  #Stop if out of board bounds
 
     return moves
-
-
 
 
 
