@@ -1,5 +1,5 @@
 import tkinter as tk
-from pieces import kingMoveset, pawnMoveset, bishopMoveset, rookMoveset, queenMoveset, knightMoveset
+from pieces import promotePawn, pawnPromotion, kingMoveset, pawnMoveset, bishopMoveset, rookMoveset, queenMoveset, knightMoveset
 
 
 board_start_x = 50
@@ -40,16 +40,16 @@ def initialize_board():
 
     # Place pawns
     for i in range(8):
-        board[1][i] = ChessPiece('Pawn', 1, i, white)  # White pawns
-        board[6][i] = ChessPiece('Pawn', 6, i, black)  # Black pawns
+        board[1][i] = ChessPiece('Pawn', 1, i, black)  # White pawns
+        board[6][i] = ChessPiece('Pawn', 6, i, white)  # Black pawns
 
     # Define the other pieces
     piece_order = ['Rook', 'Knight', 'Bishop', 'Queen', 'King', 'Bishop', 'Knight', 'Rook']
     
     # Place pieces on row 0 for white and row 7 for black
     for i, piece_name in enumerate(piece_order):
-        board[0][i] = ChessPiece(piece_name, 0, i, white)  # White pieces
-        board[7][i] = ChessPiece(piece_name, 7, i, black)  # Black pieces
+        board[0][i] = ChessPiece(piece_name, 0, i, black)  # White pieces
+        board[7][i] = ChessPiece(piece_name, 7, i, white)  # Black pieces
 
     return board
 
@@ -225,6 +225,10 @@ def on_canvas_click(event):
                             castlingMoveRight = True 
                         elif col == colChosen - 2:
                             castlingMoveLeft = True
+                    if pieceChosen.name == 'Pawn':
+                        isPromotion = pawnPromotion(row, col, board, pieceChosen.color)
+                        if isPromotion == True:
+                            promotePawn(RowChosen, colChosen, board)
 
                     ##Move piece to new position
                     prev_piece = board[row][col]
@@ -286,8 +290,12 @@ def whatColor(row, column):
     piece = board[row][column]
     color = piece.color
     return color 
-    
 
+# #Checkmate
+# def checkmate():
+
+# #Stalemate
+# def stalemate():
 
 ###################### CANVAS SET UP ///////////////////////
 main = tk.Tk()
