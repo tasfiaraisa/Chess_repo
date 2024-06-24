@@ -3,7 +3,7 @@ from pieces import kingMoveset, pawnMoveset, bishopMoveset, rookMoveset, queenMo
 
 
 board_start_x = 50
-board_start_y = 100
+board_start_y = 10
 square_size = 100
 white = 100
 black = 111
@@ -219,6 +219,7 @@ def on_canvas_click(event):
                     ##Initialize castling bools
                     castlingMoveRight = False
                     castlingMoveLeft = False
+                    prevkingUnderCheck = is_king_under_threat(board, pieceChosen.color) ##Initially was king under check 
                     if pieceChosen.name == 'King': ##Check on which side castling is occuring
                         if col == colChosen + 2:
                             castlingMoveRight = True 
@@ -241,23 +242,38 @@ def on_canvas_click(event):
                         RowChosen = None
                         colChosen = None
                         pieceChosen = None
+                        WhiteTurn = not WhiteTurn
                         return
                     
                     else: ##If king not under threat after new move, proceed
-                        pieceChosen.move(row, col)
+                        
                         if castlingMoveRight: ## If castling then move the rook piece as wel 
-                            rookPiece = board[row][col + 1]
-                            rookPiece.move(row, col - 1)
-                            board[row][col + 1] = None
-                            board[row][col - 1] = rookPiece
+                            if prevkingUnderCheck: ## Check if castling is occuring after check 
+                                print("Invalid Move: King is under threat")
+                                board[row][col] = prev_piece
+                                board[RowChosen][colChosen] = pieceChosen ##Move piece to original position 
+                                WhiteTurn = not WhiteTurn
+                                return
+                            else:
+                                rookPiece = board[row][col + 1]
+                                rookPiece.move(row, col - 1)
+                                board[row][col + 1] = None
+                                board[row][col - 1] = rookPiece
 
                         elif castlingMoveLeft:
-                            rookPiece = board[row][col - 2]
-                            rookPiece.move(row, col + 1)
-                            board[row][col - 2] = None
-                            board[row][col + 1] = rookPiece
+                            if prevkingUnderCheck: ## Check if castling is occuring after check 
+                                print("Invalid Move: King is under threat")
+                                board[row][col] = prev_piece
+                                board[RowChosen][colChosen] = pieceChosen ##Move piece to original position 
+                                WhiteTurn = not WhiteTurn
+                                return
+                            else:
+                                rookPiece = board[row][col - 2]
+                                rookPiece.move(row, col + 1)
+                                board[row][col - 2] = None
+                                board[row][col + 1] = rookPiece
                 
-                    
+                    pieceChosen.move(row, col)
                     isPieceChosen = False ##Put all these back to null 
                     RowChosen = None
                     colChosen = None
