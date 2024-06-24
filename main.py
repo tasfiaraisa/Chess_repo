@@ -198,7 +198,7 @@ def on_canvas_click(event):
                     valid_moves = kingMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
 
                 elif pieceChosen.name == 'Pawn':
-                    valid_moves = kingMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
+                    valid_moves = pawnMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
 
                 elif pieceChosen.name == 'Bishop':
                     valid_moves = bishopMoveset(RowChosen, colChosen, pieceChosen.color, board)

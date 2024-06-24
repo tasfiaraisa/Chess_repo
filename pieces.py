@@ -2,6 +2,7 @@
 #Pieces moveset
 #TO DO: Pawn, King, Queen, Rook, Bishop, Knight
 
+
 ##########################################################################################################################################
 
 #Special move rules: 
@@ -36,7 +37,7 @@ def castling(row, col, board, rookFirstMove, side):
 def pawnMoveset(row, col, color, board, firstMove):
     moves = []
     #Determines moving direction
-    direction = 1 if color == 'white' else -1
+    direction = 1 if color == 100 else -1
     startRow = row
     column = col
 
