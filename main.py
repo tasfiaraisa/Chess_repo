@@ -260,12 +260,15 @@ def knightMoveset(row, col, color, board):
 ##########################################################################################################################
 ##########################################################################################################################
 
+
 def find_king_position(board, color):
     for row in range(8):
         for col in range(8):
             piece = board[row][col]
             if piece is not None and piece.name == 'King' and piece.color == color:
+                print(f"Found {color} King at ({row}, {col})")
                 return (row, col)
+    raise ValueError(f"{color} King not found on the board")
 
 def generate_all_possible_moves(board, color):
     moves = []
@@ -273,28 +276,31 @@ def generate_all_possible_moves(board, color):
         for col in range(8):
             piece = board[row][col]
             if piece is not None and piece.color == color:
-                if piece is not None and piece.color == color:
-                    if piece.name == 'Pawn':
-                        moves.extend(kingMoveset(row, col, piece.color, board, piece.firstMove))
-                    elif piece.name == 'Bishop':
-                        moves.extend(bishopMoveset(row, col, piece.color, board))
-                    elif piece.name == 'Rook':
-                        moves.extend(rookMoveset(row, col, piece.color, board, piece.firstMove))
-                    elif piece.name == 'Queen':
-                        moves.extend(queenMoveset(row, col, piece.color, board))
-                    elif piece.name == 'Knight':
-                        moves.extend(knightMoveset(row, col, piece.color, board))
-                    elif piece.name == 'King':
-                        moves.extend(kingMoveset(row, col, piece.color, board, piece.firstMove))
+                if piece.name == 'Pawn':
+                    moves.extend(pawnMoveset(row, col, piece.color, board, piece.firstMove))
+                elif piece.name == 'Bishop':
+                    moves.extend(bishopMoveset(row, col, piece.color, board))
+                elif piece.name == 'Rook':
+                    moves.extend(rookMoveset(row, col, piece.color, board, piece.firstMove))
+                elif piece.name == 'Queen':
+                    moves.extend(queenMoveset(row, col, piece.color, board))
+                elif piece.name == 'Knight':
+                    moves.extend(knightMoveset(row, col, piece.color, board))
+                elif piece.name == 'King':
+                    moves.extend(kingMoveset(row, col, piece.color, board, piece.firstMove))
+    print(f"Generated {len(moves)} moves for {color}")
     return moves
 
 def is_king_under_threat(board, color):
     king_position = find_king_position(board, color)
-    opponent_color = 'white' if color == 'black' else 'black'
+    opponent_color = white if color == black else black
     moves = generate_all_possible_moves(board, opponent_color)
 
     if king_position in moves:
+        print(f"{color} King at {king_position} is in threat from {opponent_color}")
         return True
+    print(f"{color} King at {king_position} is not in threat")
+    return False
 
 def on_canvas_click(event):
     global isPieceChosen, RowChosen, colChosen, pieceChosen
@@ -360,29 +366,46 @@ def on_canvas_click(event):
                     valid_moves = knightMoveset(RowChosen, colChosen, pieceChosen.color, board)
 
                 if (row, col) in valid_moves:
+
                     # Move the piece
                     castlingMoveRight = False
                     castlingMoveLeft = False
-                    if(pieceChosen.name == 'King'):
-                        if(col == colChosen + 2):
+                    if pieceChosen.name == 'King':
+                        if col == colChosen + 2:
                             castlingMoveRight = True 
-                        elif (col == colChosen - 2):
+                        elif col == colChosen - 2:
                             castlingMoveLeft = True
-                    pieceChosen.move(row, col)
+
+                    prev_piece = board[row][col]
                     board[row][col] = pieceChosen
                     board[RowChosen][colChosen] = None
-                
-                    if castlingMoveRight:
-                        rookPiece = board[row][col + 1]
-                        rookPiece.move(row, col - 1)
-                        board[row][col + 1] = None 
-                        board[row][col - 1] = rookPiece
 
-                    elif castlingMoveLeft:
-                        rookPiece = board[row][col - 2]
-                        rookPiece.move(row, col + 1)
-                        board[row][col - 2] = None 
-                        board[row][col + 1] = rookPiece
+                    kingUnderCheck = is_king_under_threat(board, pieceChosen.color)
+                    if kingUnderCheck:
+                        print("Invalid Move: King is under threat")
+                        # Revert the move
+                        board[row][col] = prev_piece
+                        board[RowChosen][colChosen] = pieceChosen
+                        isPieceChosen = False
+                        RowChosen = None
+                        colChosen = None
+                        pieceChosen = None
+                        return
+                    
+                    else:
+                        pieceChosen.move(row, col)
+                        if castlingMoveRight:
+                            rookPiece = board[row][col + 1]
+                            rookPiece.move(row, col - 1)
+                            board[row][col + 1] = None
+                            board[row][col - 1] = rookPiece
+
+                        elif castlingMoveLeft:
+                            rookPiece = board[row][col - 2]
+                            rookPiece.move(row, col + 1)
+                            board[row][col - 2] = None
+                            board[row][col + 1] = rookPiece
+                
                     
                     isPieceChosen = False
                     RowChosen = None
