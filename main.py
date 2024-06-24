@@ -87,20 +87,18 @@ def draw_chessboard(board):
 ################################################### PIECES.PY ############################################################
 
 #Castling
-
-def castling(row, col, bishopFirstMove, side):
+def castling(row, col, rookFirstMove, side):
     moves = []
 
-    if bishopFirstMove:
-        if side == 0: #LEFT SIDE
-            if(all(board[row][c]) is None for c in range (col - 1, col -4, -1)):
-                moves.append(row, col - 2)
-
-        if side == 1: #RIGHT SIDE
-            if(all(board[row][c]) is None for c in range (col + 1, col + 3, 1)):
-                moves.append(row, col + 2)
-        
-        return moves     
+    if rookFirstMove:
+        if side == 0:  # LEFT SIDE (Queen's side castling)
+            if all(board[row][c] is None for c in range(col - 1, col - 4, -1)):
+                moves.append((row, col - 2))
+        elif side == 1:  # RIGHT SIDE (King's side castling)
+            if all(board[row][c] is None for c in range(col + 1, col + 3)):
+                moves.append((row, col + 2))
+    
+    return moves    
 
 
 
@@ -149,6 +147,17 @@ def kingMoveset(row, col, color, board, firstMove):
                 elif board[newRow][newCol].color != color:  #The square contains an enemy piece
                     moves.append((newRow, newCol))
     
+    if firstMove:
+        # Assume left rook is at col 0 and right rook is at col 7
+        if board[row][0] is not None and board[row][0].name == 'Rook':
+            rookFirstMoveLeft = board[row][0].firstMove
+            moves.extend(castling(row, col, rookFirstMoveLeft, 0))  # Queen's side castling
+
+        if board[row][7] is not None and board[row][7].name == 'Rook':
+            rookFirstMoveRight = board[row][7].firstMove
+            moves.extend(castling(row, col, rookFirstMoveRight, 1))  # King's side castling
+
+
     return moves
 
 
@@ -317,9 +326,29 @@ def on_canvas_click(event):
 
                 if (row, col) in valid_moves:
                     # Move the piece
+                    castlingMoveRight = False
+                    castlingMoveLeft = False
+                    if(pieceChosen.name == 'King'):
+                        if(col == colChosen + 2):
+                            castlingMoveRight = True 
+                        elif (col == colChosen - 2):
+                            castlingMoveLeft = True
                     pieceChosen.move(row, col)
                     board[row][col] = pieceChosen
                     board[RowChosen][colChosen] = None
+                
+                    if castlingMoveRight:
+                        rookPiece = board[row][col + 1]
+                        rookPiece.move(row, col - 1)
+                        board[row][col + 1] = None 
+                        board[row][col - 1] = rookPiece
+
+                    elif castlingMoveLeft:
+                        rookPiece = board[row][col - 2]
+                        rookPiece.move(row, col + 1)
+                        board[row][col - 2] = None 
+                        board[row][col + 1] = rookPiece
+                    
                     isPieceChosen = False
                     RowChosen = None
                     colChosen = None
