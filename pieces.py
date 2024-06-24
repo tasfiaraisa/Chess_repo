@@ -82,11 +82,27 @@ def kingMoveset(row, col, color, board, firstMove):
 
 # #Rook Moves
 # #Code here
-# def rookMoveset(position, color, board)
+def rookMoveset(row, col, color, board, firstMove):
+    moves = []
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+    #Check each of the four possible diagonal directions
+    for d in directions:
+        for i in range(1, 8):  #bishop can move up to 7 squares in each direction
+            newRow, newCol = row + d[0] * i, col + d[1] * i
+            if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
+                if board[newRow][newCol] is None:  #The square is empty
+                    moves.append((newRow, newCol))
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
+                    moves.append((newRow, newCol))
+                    break  #Stop extending in this direction after a capture
+                else:
+                    break  #Stop if there is a piece of the same color
+            else:
+                break  #Stop if out of board bounds
+
+    return moves
     
-
-
-
 
 # #
 

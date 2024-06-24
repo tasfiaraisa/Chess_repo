@@ -86,7 +86,25 @@ def draw_chessboard(board):
 
 ################################################### PIECES.PY ############################################################
 
+#Castling
 
+def castling(row, col, bishopFirstMove, side):
+    moves = []
+
+    if bishopFirstMove:
+        if side == 0: #LEFT SIDE
+            if(all(board[row][c]) is None for c in range (col - 1, col -4, -1)):
+                moves.append(row, col - 2)
+
+        if side == 1: #RIGHT SIDE
+            if(all(board[row][c]) is None for c in range (col + 1, col + 3, 1)):
+                moves.append(row, col + 2)
+        
+        return moves     
+
+
+
+###################################################################################################################
 #Pawn Moves
 #to be checked, not done yet
 def pawnMoveset(row, col, color, board, firstMove):
@@ -159,6 +177,75 @@ def bishopMoveset(row, col, color, board):
 
     return moves
 
+##########################################################################################################################################
+
+# #Rook Moves
+# #Code here
+def rookMoveset(row, col, color, board, firstMove):
+    moves = []
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+    #Check each of the four possible horizontal and vertical directions
+    for d in directions:
+        for i in range(1, 8):  #bishop can move up to 7 squares in each direction
+            newRow, newCol = row + d[0] * i, col + d[1] * i
+            if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
+                if board[newRow][newCol] is None:  #The square is empty
+                    moves.append((newRow, newCol))
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
+                    moves.append((newRow, newCol))
+                    break  #Stop extending in this direction after a capture
+                else:
+                    break  #Stop if there is a piece of the same color
+            else:
+                break  #Stop if out of board bounds
+
+    return moves
+
+
+
+##########################################################################################################################################
+
+# #Queen Moves
+# #Code here
+def queenMoveset(row, col, color, board):
+    moves = []
+    directions = [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, 1), (1, 0), (0, -1), (-1, 0)]  
+
+    #Check for all possible directions 
+    for d in directions:
+        for i in range(1, 8):  #bishop can move up to 7 squares in each direction
+            newRow, newCol = row + d[0] * i, col + d[1] * i
+            if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
+                if board[newRow][newCol] is None:  #The square is empty
+                    moves.append((newRow, newCol))
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
+                    moves.append((newRow, newCol))
+                    break  #Stop extending in this direction after a capture
+                else:
+                    break  #Stop if there is a piece of the same color
+            else:
+                break  #Stop if out of board bounds
+
+    return moves
+
+##########################################################################################################################################
+
+# #Knight Moves
+# #Code here
+def knightMoveset(row, col, color, board):
+    moves = []
+    directions = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]
+
+    for d in directions:
+            newRow, newCol = row + d[0], col + d[1]
+            if 0 <= newRow < 8 and 0 <= newCol < 8:  #Ensure that the position is still on the board
+                if board[newRow][newCol] is None:  #The square is empty
+                    moves.append((newRow, newCol))
+                elif board[newRow][newCol].color != color:  #The square contains an enemy piece
+                    moves.append((newRow, newCol))
+    
+    return moves
 
 
 ##########################################################################################################################
@@ -209,17 +296,25 @@ def on_canvas_click(event):
                 return
             else:
                 # Check if move valid 
-                # valid_moves = []              
-                # if pieceChosen.name is 'King':
-                #     valid_moves = kingMoveset(RowChosen, colChosen, pieceChosen.color, board)
+                valid_moves = []              
+                if pieceChosen.name == 'King':
+                    valid_moves = kingMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
 
-                # elif pieceChosen.name is 'Pawn':
-                #     valid_moves = pawnMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
+                elif pieceChosen.name == 'Pawn':
+                    valid_moves = kingMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
 
-                # elif pieceChosen.name is 'Bishop':
-                #     valid_moves = bishopMoveset(RowChosen, colChosen, pieceChosen.color, board)
+                elif pieceChosen.name == 'Bishop':
+                    valid_moves = bishopMoveset(RowChosen, colChosen, pieceChosen.color, board)
+                
+                elif pieceChosen.name == 'Rook':
+                    valid_moves = rookMoveset(RowChosen, colChosen, pieceChosen.color, board, pieceChosen.firstMove)
 
-                valid_moves = bishopMoveset(RowChosen, colChosen, pieceChosen.color, board)
+                elif pieceChosen.name == 'Queen':
+                    valid_moves = queenMoveset(RowChosen, colChosen, pieceChosen.color, board)
+
+                elif pieceChosen.name == 'Knight':
+                    valid_moves = knightMoveset(RowChosen, colChosen, pieceChosen.color, board)
+
                 if (row, col) in valid_moves:
                     # Move the piece
                     pieceChosen.move(row, col)
