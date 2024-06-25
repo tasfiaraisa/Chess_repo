@@ -225,6 +225,10 @@ def on_canvas_click(event):
                             castlingMoveRight = True 
                         elif col == colChosen - 2:
                             castlingMoveLeft = True
+                    if pieceChosen.name == 'Pawn':
+                        isPromotion = pawnPromotion(row, col, board, pieceChosen.color)
+                        if isPromotion:
+                            
 
                     ##Move piece to new position
                     prev_piece = board[row][col]
