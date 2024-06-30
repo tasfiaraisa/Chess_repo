@@ -1,4 +1,3 @@
-
 #Pieces moveset
 #TO DO: Pawn, King, Queen, Rook, Bishop, Knight
 
@@ -37,7 +36,7 @@ def castling(row, col, board, rookFirstMove, side):
 def pawnMoveset(row, col, color, board, firstMove):
     moves = []
     #Determines moving direction
-    direction = 1 if color == 100 else -1 ## WHITE == 100
+    direction = 1 if color == 111 else -1
     startRow = row
     column = col
 
@@ -57,8 +56,25 @@ def pawnMoveset(row, col, color, board, firstMove):
     if column < 7:  #Ensure within the board limits
         if board[startRow + direction][column + 1] is not None and board[startRow + direction][column + 1].color != color:
             moves.append((startRow + direction, column + 1))
-
     return moves
+
+#Promotion
+def pawnPromotion(row, col, board, color):
+    #Check for pawn reaching the last row
+    promotionRow = 0 if color == 100 else 7
+    if row == promotionRow:
+        return True  #Returns True if pawn needs promotion
+    return False
+
+def promotePawn(row, col, board):
+    #Assuming new_piece is a class instance of the chosen piece (e.g., Queen, Rook, etc.)
+    createNewPiece =  board[row][col]
+    if createNewPiece.name == 'Pawn':
+        NewPiece = input("choose your piece: \n")
+    while NewPiece != 'Queen' and NewPiece != 'Bishop' and NewPiece != 'Rook' and NewPiece != 'Knight':
+        NewPiece = input("choose your piece: \n")
+    createNewPiece.name = NewPiece
+    return
 
 ##########################################################################################################################################
 
@@ -185,3 +201,11 @@ def knightMoveset(row, col, color, board):
     
     return moves
 
+##########################################################################################################################################
+
+# #CheckMate
+# #Code here
+def checkMate(row, col, color, board):
+    
+    
+    return moves
