@@ -282,20 +282,103 @@ def on_canvas_click(event):
                     RowChosen = None
                     colChosen = None
                     pieceChosen = None
+                    currentColor = white if WhiteTurn else black
+                    if checkmate(board, currentColor):
+                        print("Checkmate")
+                    if stalemate(board, currentColor):
+                        print("Stalemate")
                     draw_chessboard(board)
-               
-                return
+                    return
 
 def whatColor(row, column):
     piece = board[row][column]
     color = piece.color
     return color 
 
+
+#Check if move legal
+def move_is_legal(board, start_row, start_col, end_row, end_col, color):
+    # Simulate the move
+    piece = board[start_row][start_col]
+    target_piece = board[end_row][end_col]
+    board[end_row][end_col] = piece
+    board[start_row][start_col] = None
+    
+    # Check if this move puts or leaves the king in check
+    in_check = is_king_under_threat(board, color)
+    
+    # Undo the move
+    board[start_row][start_col] = piece
+    board[end_row][end_col] = target_piece
+    
+    return not in_check
+#Checkmate threats
+def checkmate_threat(piece):
+    moves = []
+    if piece.name == 'Pawn':
+        moves.extend(pawnMoveset(piece.row, piece.column, piece.color, board, piece.firstMove))
+    elif piece.name == 'Bishop':
+        moves.extend(bishopMoveset(piece.row, piece.column, piece.color, board))
+    elif piece.name == 'Rook':
+        moves.extend(rookMoveset(piece.row, piece.column, piece.color, board, piece.firstMove))
+    elif piece.name == 'Queen':
+        moves.extend(queenMoveset(piece.row, piece.column, piece.color, board))
+    elif piece.name == 'Knight':
+        moves.extend(knightMoveset(piece.row, piece.column, piece.color, board))
+    elif piece.name == 'King':
+        moves.extend(kingMoveset(piece.row, piece.column, piece.color, board, piece.firstMove))
+
+
 # #Checkmate
-# def checkmate():
+def checkmate(board, color):
+    if not is_king_under_threat(board, color):
+        return False  # Not in checkmate if the king is not in check
+    
+    # Check all possible moves for the current player
+    for row in range(8):
+        for col in range(8):
+            piece = board[row][col]
+            if piece and piece.color == color:
+                moves = checkmate_threat(piece)
+                if moves is not None:
+                    for move in moves:
+                        if move_is_legal(board, row, col, move[0], move[1], color):
+                            return False  # There's a legal move, so not checkmate
+    return True  # No legal moves left, king is in check
+
+#Stalemate check
+def stalemate_check(piece):
+    if piece.name == 'Pawn':
+        return pawnMoveset(piece.row, piece.column, piece.color, board, piece.firstMove)
+    elif piece.name == 'Bishop':
+        return bishopMoveset(piece.row, piece.column, piece.color, board)
+    elif piece.name == 'Rook':
+        return rookMoveset(piece.row, piece.column, piece.color, board, piece.firstMove)
+    elif piece.name == 'Queen':
+        return queenMoveset(piece.row, piece.column, piece.color, board)
+    elif piece.name == 'Knight':
+        return knightMoveset(piece.row, piece.column, piece.color, board)
+    elif piece.name == 'King':
+        return kingMoveset(piece.row, piece.column, piece.color, board, piece.firstMove)
+    return []
+
 
 # #Stalemate
-# def stalemate():
+def stalemate(board, color):
+    if is_king_under_threat(board, color):
+        return False  # Can't be stalemate if the king is in check
+    
+    # Check all possible moves for the current player
+    for row in range(8):
+        for col in range(8):
+            piece = board[row][col]
+            if piece and piece.color == color:
+                moves = stalemate_check(piece)
+                for move in moves:
+                    if move_is_legal(board, row, col, move[0], move[1], color):
+                        return False  # There's a legal move, so not stalemate
+    return True  # No legal moves left, and king is not in check
+
 
 ###################### CANVAS SET UP ///////////////////////
 main = tk.Tk()

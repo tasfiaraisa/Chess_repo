@@ -155,7 +155,7 @@ def rookMoveset(row, col, color, board, firstMove):
                 break  #Stop if out of board bounds
 
     return moves
-
+                                                   
 
 
 ##########################################################################################################################################
@@ -203,9 +203,3 @@ def knightMoveset(row, col, color, board):
 
 ##########################################################################################################################################
 
-# #CheckMate
-# #Code here
-def checkMate(row, col, color, board):
-    
-    
-    return moves

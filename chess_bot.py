@@ -1,5 +1,5 @@
 ## CHESS ENGINE 
-from pieces import checkMate, staleMate 
+from main import checkmate, stalemate 
 
 pieces_values = {'Pawn' : 1, 'Rook' : 5, 'Knight' : 3, 'Bishop' : 3, 'Queen' : 9, 'King' : 0}
 WHITE = 100
@@ -16,15 +16,16 @@ class Move:
         self.promotion = False
 
 def evaluateBoard(board):
-    if is_checkMate(board, WHITE):
+    if checkmate(board, WHITE):
         return -10000
 
-    if is_checkMate(board, BLACK):
+    if checkmate(board, BLACK):
         return 10000
-    if is_staleMate(board, WHITE):
+    
+    if stalemate(board, WHITE):
         return 0
 
-    if is_staleMate(board, BLACK):
+    if stalemate(board, BLACK):
         return 0
      
     score = 0
@@ -32,9 +33,9 @@ def evaluateBoard(board):
         for col in range(8):
             piece = board[row][col]
             if piece.name in pieces_values:
-                if piece.color == 111: ##BLACK
+                if piece.color == BLACK: ##BLACK
                     score += pieces_values[piece.name]
-                elif piece.color == 100: ##WHITE
+                elif piece.color == WHITE: ##WHITE
                     score -= pieces_values[piece.name]
 
     return score
