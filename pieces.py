@@ -15,24 +15,13 @@
 ################################################### PIECES.PY ############################################################
 
 #Castling
-def castling(row, col, board, rookFirstMove, side):
-    moves = []
-
-    if rookFirstMove:
-        if side == 0:  # LEFT SIDE (Queen's side castling)
-            if all(board[row][c] is None for c in range(col - 1, col - 4, -1)):
-                moves.append((row, col - 2))
-        elif side == 1:  # RIGHT SIDE (King's side castling)
-            if all(board[row][c] is None for c in range(col + 1, col + 3)):
-                moves.append((row, col + 2))
-    
-    return moves    
-
 def can_CastleKingside(king, board):
     if king.has_moved or board[king.row][7] is None or board[king.row][7].has_moved:
         return False
+    # Ensure there are no pieces between the king and the rook
     if any(board[king.row][i] for i in range(king.col + 1, 7)):
         return False
+    # Ensure the king does not pass through check
     if any(is_square_under_attack(board, king.row, i, king.color) for i in range(king.col, king.col + 3)):
         return False
     return True
@@ -76,6 +65,7 @@ def pawnMoveset(row, col, color, board, firstMove):
     return moves
 
 #Promotion
+# #for the human player
 def pawnPromotion(row, col, board, color):
     # Check for pawn reaching the last row
     promotionRow = 0 if color == 100 else 7
@@ -91,13 +81,35 @@ def promotePawn(row, col, board, promotion_choice='Queen'):
     createNewPiece = board[row][col]
     if createNewPiece.name == 'Pawn':
         if promotion_choice == 'Queen':
-            board[row][col] = Queen(createNewPiece.color)  # Assuming Queen class is defined
+            board[row][col] = Queen(createNewPiece.color)
         elif promotion_choice == 'Rook':
-            board[row][col] = Rook(createNewPiece.color)  # Assuming Rook class is defined
+            board[row][col] = Rook(createNewPiece.color)
         elif promotion_choice == 'Bishop':
-            board[row][col] = Bishop(createNewPiece.color)  # Assuming Bishop class is defined
+            board[row][col] = Bishop(createNewPiece.color)
         elif promotion_choice == 'Knight':
-            board[row][col] = Knight(createNewPiece.color)  # Assuming Knight class is defined
+            board[row][col] = Knight(createNewPiece.color)
+
+# #for the bot player
+def promotePawnBot(row, col, board, color, promotion_choice=None):
+    if not pawnPromotion(row, col, board, color):
+        return  # No promotion if the pawn is not on the correct row
+    
+    # AI or strategy-based decision for promotion, if not specified
+    if not promotion_choice:
+        promotion_choice = decidePromotionPiece(board, color)
+    
+    # Create a new piece based on the promotion choice
+    if promotion_choice == 'Queen':
+        board[row][col] = Queen(color)
+    elif promotion_choice == 'Rook':
+        board[row][col] = Rook(color)
+    elif promotion_choice == 'Bishop':
+        board[row][col] = Bishop(color)
+    elif promotion_choice == 'Knight':
+        board[row][col] = Knight(color)
+
+def decidePromotionPiece(board, color):
+    return 'Queen'
 
 
 ##########################################################################################################################################
