@@ -15,42 +15,44 @@
 ################################################### PIECES.PY ############################################################
 
 #Castling
-def castling(king, board, kingside=True):
-    if king.has_moved:
-        return False  # Cannot castle if the king has already moved
+def castling(row, col, board, is_kingside, first_move):
+    if not first_move:
+        return []
 
-    # Set parameters based on kingside or queenside castling
-    direction = 1 if kingside else -1
-    rook_col = 7 if kingside else 0
-    step = 1 if kingside else -1
-    check_positions = range(king.col + step, rook_col, step)
-    final_king_pos = king.col + 2 * direction
-    final_rook_pos = king.col + direction
+    king = board[row][col]
+    direction = 1 if is_kingside else -1
+    rook_col = 7 if is_kingside else 0
+    step = 1 if is_kingside else -1
+    check_positions = range(col + step, rook_col, step)
+    final_king_pos = col + 2 * direction
+    final_rook_pos = col + direction
 
-    # Ensure the rook exists and hasn't moved
-    rook = board[king.row][rook_col]
-    if rook is None or rook.has_moved:
-        return False
+    # Check for empty spaces between king and rook
+    if any(board[row][pos] for pos in check_positions):
+        return []
 
-    # Ensure there are no pieces between the king and the rook
-    if any(board[king.row][pos] for pos in check_positions):
-        return False
+    # Check if the king passes through a square under attack
+    if any(is_square_under_attack(board, row, pos, king.color) for pos in range(col, final_king_pos + direction, direction)):
+        return []
 
-    # Ensure no positions the king crosses are under attack
-    for pos in range(king.col, final_king_pos + direction, direction):
-        if is_square_under_attack(board, king.row, pos, king.color):
-            return False
+    # Assuming the rook is in the correct position and hasn't moved
+    rook = board[row][rook_col]
+    if rook is None or rook.firstMove == False:
+        return []
 
-    # Move the king and rook
-    board[king.row][king.col], board[king.row][final_king_pos] = None, king
-    board[king.row][rook_col], board[king.row][final_rook_pos] = None, rook
-    king.has_moved = rook.has_moved = True
-    return True
+    # Perform the castling move
+    # You might want to move these lines to the part of the code where moves are actually made
+    board[row][col], board[row][final_king_pos] = None, king
+    board[row][rook_col], board[row][final_rook_pos] = None, rook
+    king.firstMove = rook.firstMove = False
+
+    # Return the new positions as a valid move
+    return [(row, final_king_pos)]
 
 def is_square_under_attack(board, row, col, color):
-    # Placeholder for checking if a square is under attack
-    # You would need to implement this based on your game logic
+    # This function needs a full implementation to check for attacks
     pass
+
 
 
 
@@ -155,6 +157,13 @@ def kingMoveset(row, col, color, board, firstMove):
         if board[row][7] is not None and board[row][7].name == 'Rook':
             rookFirstMoveRight = board[row][7].firstMove
             moves.extend(castling(row, col, board, rookFirstMoveRight, 1))  # King's side castling
+    # King's side castling
+    if board[row][7] is not None and board[row][7].name == 'Rook' and board[row][7].firstMove:
+        moves.extend(castling(row, col, board, True, piece.firstMove))
+
+    # Queen's side castling
+    if board[row][0] is not None and board[row][0].name == 'Rook' and board[row][0].firstMove:
+        moves.extend(castling(row, col, board, False, piece.firstMove))
 
 
     return moves
