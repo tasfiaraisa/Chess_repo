@@ -13,6 +13,8 @@ RowChosen = 0
 colChosen = 0
 WhiteTurn = True # To KEEP TRACK OF WHICH SIDE'S TURN IT IS 
 
+############## GLOBAL VARIABLES ///////////////////////////////
+lastMove = None
 
 
 ###################### CLASSES /////////////////////////////////
@@ -133,7 +135,7 @@ def is_king_under_threat(board, color):
 
 ## CLICKING FUNCTION
 def on_canvas_click(event):
-    global isPieceChosen, RowChosen, colChosen, pieceChosen, WhiteTurn
+    global isPieceChosen, RowChosen, colChosen, pieceChosen, WhiteTurn, lastMove
     col = (event.x - board_start_x) // square_size
     row = (event.y - board_start_y) // square_size
     if 0 <= col < 8 and 0 <= row < 8:  # Ensure the click is within the bounds of the chessboard
