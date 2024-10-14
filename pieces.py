@@ -28,6 +28,23 @@ def castling(row, col, board, rookFirstMove, side):
     
     return moves    
 
+def can_CastleKingside(king, board):
+    if king.has_moved or board[king.row][7] is None or board[king.row][7].has_moved:
+        return False
+    if any(board[king.row][i] for i in range(king.col + 1, 7)):
+        return False
+    if any(is_square_under_attack(board, king.row, i, king.color) for i in range(king.col, king.col + 3)):
+        return False
+    return True
+
+def can_CastleQueenside(king, board):
+    if king.has_moved or board[king.row][0] is None or board[king.row][0].has_moved:
+        return False
+    if any(board[king.row][i] for i in range(1, king.col)):
+        return False
+    if any(is_square_under_attack(board, king.row, i, king.color) for i in range(king.col - 2, king.col + 1)):
+        return False
+    return True
 
 
 ###################################################################################################################
@@ -60,21 +77,28 @@ def pawnMoveset(row, col, color, board, firstMove):
 
 #Promotion
 def pawnPromotion(row, col, board, color):
-    #Check for pawn reaching the last row
+    # Check for pawn reaching the last row
     promotionRow = 0 if color == 100 else 7
     if row == promotionRow:
-        return True  #Returns True if pawn needs promotion
+        return True  # Returns True if pawn needs promotion
     return False
 
-def promotePawn(row, col, board):
-    #Assuming new_piece is a class instance of the chosen piece (e.g., Queen, Rook, etc.)
-    createNewPiece =  board[row][col]
+def promotePawn(row, col, board, promotion_choice='Queen'):
+    # Ensure the pawn at the location can be promoted
+    if not pawnPromotion(row, col, board, board[row][col].color):
+        return  # No promotion if not on the correct row
+
+    createNewPiece = board[row][col]
     if createNewPiece.name == 'Pawn':
-        NewPiece = input("choose your piece: \n")
-    while NewPiece != 'Queen' and NewPiece != 'Bishop' and NewPiece != 'Rook' and NewPiece != 'Knight':
-        NewPiece = input("choose your piece: \n")
-    createNewPiece.name = NewPiece
-    return
+        if promotion_choice == 'Queen':
+            board[row][col] = Queen(createNewPiece.color)  # Assuming Queen class is defined
+        elif promotion_choice == 'Rook':
+            board[row][col] = Rook(createNewPiece.color)  # Assuming Rook class is defined
+        elif promotion_choice == 'Bishop':
+            board[row][col] = Bishop(createNewPiece.color)  # Assuming Bishop class is defined
+        elif promotion_choice == 'Knight':
+            board[row][col] = Knight(createNewPiece.color)  # Assuming Knight class is defined
+
 
 ##########################################################################################################################################
 
@@ -201,5 +225,15 @@ def knightMoveset(row, col, color, board):
     
     return moves
 
+
 ##########################################################################################################################################
 
+# #En Passant logic
+def en_passant(pawn, board, last_move):
+    if last_move.piece.name == 'Pawn' and abs(last_move.start_row - last_move.end_row) == 2:
+        if pawn.row == last_move.end_row and abs(pawn.col - last_move.end_col) == 1:
+            # En passant is possible, set up capture mechanics in your game state
+            return True
+    return False
+
+##########################################################################################################################################
