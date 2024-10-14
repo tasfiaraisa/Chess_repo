@@ -15,25 +15,43 @@
 ################################################### PIECES.PY ############################################################
 
 #Castling
-def can_CastleKingside(king, board):
-    if king.has_moved or board[king.row][7] is None or board[king.row][7].has_moved:
+def castling(king, board, kingside=True):
+    if king.has_moved:
+        return False  # Cannot castle if the king has already moved
+
+    # Set parameters based on kingside or queenside castling
+    direction = 1 if kingside else -1
+    rook_col = 7 if kingside else 0
+    step = 1 if kingside else -1
+    check_positions = range(king.col + step, rook_col, step)
+    final_king_pos = king.col + 2 * direction
+    final_rook_pos = king.col + direction
+
+    # Ensure the rook exists and hasn't moved
+    rook = board[king.row][rook_col]
+    if rook is None or rook.has_moved:
         return False
+
     # Ensure there are no pieces between the king and the rook
-    if any(board[king.row][i] for i in range(king.col + 1, 7)):
+    if any(board[king.row][pos] for pos in check_positions):
         return False
-    # Ensure the king does not pass through check
-    if any(is_square_under_attack(board, king.row, i, king.color) for i in range(king.col, king.col + 3)):
-        return False
+
+    # Ensure no positions the king crosses are under attack
+    for pos in range(king.col, final_king_pos + direction, direction):
+        if is_square_under_attack(board, king.row, pos, king.color):
+            return False
+
+    # Move the king and rook
+    board[king.row][king.col], board[king.row][final_king_pos] = None, king
+    board[king.row][rook_col], board[king.row][final_rook_pos] = None, rook
+    king.has_moved = rook.has_moved = True
     return True
 
-def can_CastleQueenside(king, board):
-    if king.has_moved or board[king.row][0] is None or board[king.row][0].has_moved:
-        return False
-    if any(board[king.row][i] for i in range(1, king.col)):
-        return False
-    if any(is_square_under_attack(board, king.row, i, king.color) for i in range(king.col - 2, king.col + 1)):
-        return False
-    return True
+def is_square_under_attack(board, row, col, color):
+    # Placeholder for checking if a square is under attack
+    # You would need to implement this based on your game logic
+    pass
+
 
 
 ###################################################################################################################
